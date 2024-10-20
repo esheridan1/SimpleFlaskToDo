@@ -1,15 +1,17 @@
 # in terminal run pip install Flask Flask-Scss Flask-SQLAlchemy
 
-
-
 from flask import Flask, render_template, request,redirect
 from flask_scss import Scss
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+#import os
+#print(f"Database path: {os.path.abspath('database.db')}")
+# Database appears in C:\Users\User\PycharmProjects\flaskwebapp\venv\var\app-instance
 
 app = Flask(__name__)
 Scss(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATION"]=False
 db = SQLAlchemy(app)
 
 class Todo(db.Model):
@@ -28,6 +30,9 @@ class Todo(db.Model):
     
     def __repr__(self):
         return f'<Task {self.id}'
+
+with app.app_context():
+        db.create_all()        
 
 @app.route('/', methods=["POST","GET"])
 def index():
@@ -90,7 +95,5 @@ def update(id):
     else:
         return render_template("update.html", task=task)
 
-if __name__ in "__main__":
-    with app.app_context():
-        db.create_all()
+if __name__ == "__main__":
     app.run(debug=True)
